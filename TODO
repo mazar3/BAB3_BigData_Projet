@@ -1,0 +1,13 @@
+(<<< = FAIT)
+
+- MCD
+- MLD
+
+<<<- Séparer la page login en 2 pages login/register (voir amazon)
+- Possibilité de créer plusieurs comptes avec le même email : à corriger
+- Pour inscription : Rajouter tous les champs pour remplir la table (nom prenom tel etc)
+    <<<Tel à corriger
+    <<<< Code SQL pour confirmer
+    <<<< Ajouter l'envoi des autres variables
+<<<< Quand erreur : ça clear tous les champs, ce serait bien que ça garde ce qu'il y avait
+- Mdp oublié? => envoie par mail ou quoi
