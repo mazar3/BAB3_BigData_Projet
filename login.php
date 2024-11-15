@@ -4,23 +4,30 @@ session_start();
 include 'db_connect.php';
 $message = '';
 
-
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['action'] == 'login') {
     $email = $_POST['email'];
     $password = $_POST['password'];
 
-    $stmt = $connection->prepare("SELECT idUtilisateur, MotDePasseHash FROM utilisateur WHERE Email = ?");
+    $stmt = $connection->prepare("
+        SELECT u.idUtilisateur, u.MotDePasseHash, r.idRole, r.description
+        FROM utilisateur u
+        JOIN Role r ON u.idRole = r.idRole
+        WHERE u.Email = ?
+    ");
+
     $stmt->bind_param("s", $email);
     $stmt->execute();
     $stmt->store_result();
 
     if ($stmt->num_rows > 0) {
-        $stmt->bind_result($user_id, $passwordHash);
+        $stmt->bind_result($user_id, $passwordHash, $role_id, $role_description);
         $stmt->fetch();
 
         if (password_verify($password, $passwordHash)) {
             $_SESSION['user_id'] = $user_id;
             $_SESSION['email'] = $email;
+            $_SESSION['idRole'] = $role_id;
+            $_SESSION['role_description'] = $role_description;
             header("Location: dashboard.php");
             exit();
         } else {

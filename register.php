@@ -6,22 +6,19 @@ $message = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['action'] == 'register')
 {
-    // Processus d'inscription
     $email = $_POST['email'];
     $password = $_POST['password'];
     $confirmPassword = $_POST['confirmPassword'];
-    $nom = $_POST['Nom']; // Correspondance avec le nom du champ du formulaire
-    $prenom = $_POST['Prenom']; // Correspondance avec le nom du champ du formulaire
+    $nom = $_POST['Nom'];
+    $prenom = $_POST['Prenom'];
     $telephone = $_POST['tel'];
 
-    // Vérifier que les mots de passe correspondent
     if ($password !== $confirmPassword)
     {
         $message = "Les mots de passe ne correspondent pas.";
     }
     else
     {
-        // Vérifier si l'email existe déjà
         $stmt = $connection->prepare("SELECT idUtilisateur FROM utilisateur WHERE Email = ?");
         $stmt->bind_param("s", $email);
         $stmt->execute();
@@ -29,20 +26,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
 
         if ($stmt->num_rows > 0)
         {
-            // Si l'email existe déjà
             $message = "Cette adresse email est déjà utilisée.";
         }
         else
         {
-            // Si l'email n'existe pas, insérer les nouvelles données
             $passwordHash = password_hash($password, PASSWORD_BCRYPT);
 
-            // Préparer l'insertion de toutes les variables
-            $stmt = $connection->prepare("INSERT INTO utilisateur (Email, MotDePasseHash, Nom, Prenom, Telephone) VALUES (?, ?, ?, ?, ?)");
-            // Vous pouvez modifier les noms des colonnes ci-dessus selon votre table SQL
+            $defaultRoleId = 4;
 
-            // Lier les paramètres
-            $stmt->bind_param("sssss", $email, $passwordHash, $nom, $prenom, $telephone);
+            $stmt = $connection->prepare("
+                INSERT INTO utilisateur (Email, MotDePasseHash, Nom, Prenom, Telephone, idRole)
+                VALUES (?, ?, ?, ?, ?, ?)
+            ");
+            $stmt->bind_param("sssssi", $email, $passwordHash, $nom, $prenom, $telephone, $defaultRoleId);
 
             if ($stmt->execute())
             {
@@ -107,7 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
             input.value = input.value.replace(/[^0-9]/g, ''); // Remplace tout caractère non numérique par rien
         }
     </script>
-    <p>Déjà inscrit ? <a href="index.php">Connectez-vous ici</a></p>
+    <p>Déjà inscrit ? <a href="login.php">Connectez-vous ici</a></p>
 </div>
 </body>
 </html>

@@ -1,23 +1,29 @@
 <?php
 session_start();
+
 if (!isset($_SESSION['user_id'])) {
-    header("Location: index.php");
+    header("Location: login.php");
     exit();
 }
-?>
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Tableau de bord</title>
-    <!-- Inclusion de Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
-</head>
-<body>
-<div class="container mt-5">
-    <h1>Bienvenue sur votre tableau de bord</h1>
-    <p>Vous êtes connecté en tant que : <?= htmlspecialchars($_SESSION['email']) ?></p>
-    <a href="logout.php" class="btn btn-danger">Se déconnecter</a>
-</div>
-</body>
-</html>
+$role_description = $_SESSION['role_description'];
+
+switch ($role_description) {
+    case 'Administrateur':
+        header("Location: admin_dashboard.php");
+        break;
+    case 'Responsable de projet':
+        header("Location: manager_dashboard.php");
+        break;
+    case 'Collaborateur':
+        header("Location: collaborator_dashboard.php");
+        break;
+    case 'Client':
+        header("Location: client_dashboard.php");
+        break;
+    default:
+        echo "Rôle non reconnu.";
+        session_destroy();
+        exit();
+}
+?>
