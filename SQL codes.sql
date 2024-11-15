@@ -4,14 +4,17 @@ CREATE TABLE Utilisateur (
      idUtilisateur INT AUTO_INCREMENT PRIMARY KEY,
      Nom VARCHAR(50),
      Prenom VARCHAR(50),
-     Telephone VARCHAR(10) NOT NULL,
+     Telephone VARCHAR(15) NOT NULL,
      Email VARCHAR(250),
      idAdresse INT,
      idRole INT,
      idProjet INT,
-     idCommande INT
+     idCommande INT,
+     CONSTRAINT unique_email UNIQUE (Email),
+     CONSTRAINT lien_utilisateur_role FOREIGN KEY (idRole) REFERENCES Role (idRole)
+         ON DELETE SET NULL
+         ON UPDATE CASCADE
 );
-ALTER TABLE Utilisateur ADD CONSTRAINT unique_email UNIQUE (Email);
 
 CREATE TABLE Adresse(
     idAdresse INT AUTO_INCREMENT PRIMARY KEY,
@@ -22,18 +25,14 @@ CREATE TABLE Adresse(
     Ville VARCHAR(50),
     Pays VARCHAR(50),
     idUtilisateur INT,
-    CONSTRAINT lien_utilisateur_adresse FOREIGN KEY (idAdresse) REFERENCES Utilisateur (idAdresse)
-        ON DELETE CASCADE
+    CONSTRAINT lien_utilisateur_adresse FOREIGN KEY (idUtilisateur) REFERENCES Utilisateur (idUtilisateur)
+        ON DELETE SET NULL
         ON UPDATE CASCADE
 );
 
 CREATE TABLE Role(
     idRole INT AUTO_INCREMENT PRIMARY KEY,
     Description VARCHAR(250),
-    idUtilisateur INT,
-    CONSTRAINT lien_utilisateur_role FOREIGN KEY (idRole) REFERENCES Utilisateur (idRole)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
 );
 
 CREATE TABLE Projet(
@@ -43,12 +42,19 @@ CREATE TABLE Projet(
     Date_Fin DATE,
     Statut VARCHAR(50),
     idUtilisateur INT,
-    idDevis INT,
+    idPanier INT,
     idContrat INT,
     idService INT,
-    CONSTRAINT lien_utilisateur_projet FOREIGN KEY (idProjet) REFERENCES Utilisateur (idProjet)
-        ON DELETE CASCADE
+    CONSTRAINT lien_utilisateur_projet FOREIGN KEY (idUtilisateur) REFERENCES Utilisateur (idUtilisateur)
+        ON DELETE SET NULL
+        ON UPDATE CASCADE,
+    CONSTRAINT lien_projet_contrat FOREIGN KEY (idContrat) REFERENCES Contrat (idContrat)
+        ON DELETE SET NULL
+        ON UPDATE CASCADE,
+    CONSTRAINT lien_projet_panier FOREIGN KEY (idPanier) REFERENCES Devis (idPanier)
+        ON DELETE SET NULL
         ON UPDATE CASCADE
+
 );
 
 CREATE TABLE Contrat(
@@ -56,26 +62,20 @@ CREATE TABLE Contrat(
     Date_Signature DATE,
     Date_Fin DATE,
     idClause INT,
-    CONSTRAINT lien_contrat_projet FOREIGN KEY (idContrat) REFERENCES Projet (idContrat)
-        ON DELETE CASCADE
+    CONSTRAINT lien_contrat_clause FOREIGN KEY (idClause) REFERENCES Clause (idClause)
+        ON DELETE SET NULL
         ON UPDATE CASCADE
 );
 
 CREATE TABLE Clause(
     idClause INT AUTO_INCREMENT PRIMARY KEY,
-    Description VARCHAR(255) NOT NULL,
-    CONSTRAINT lien_contrat_clause FOREIGN KEY (idClause) REFERENCES Contrat (idClause)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
+    Description VARCHAR(255) NOT NULL
 );
 
-CREATE TABLE Devis(
-    idDevis INT AUTO_INCREMENT PRIMARY KEY,
-    Date_Devis DATE,
-    Statut VARCHAR(50),
-    CONSTRAINT lien_projet_devis FOREIGN KEY (idDevis) REFERENCES Projet (idDevis)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
+CREATE TABLE Panier(
+    idPanier INT AUTO_INCREMENT PRIMARY KEY,
+    Date_Panier DATE,
+    Statut VARCHAR(50)
 );
 
 CREATE TABLE Service(
@@ -85,14 +85,16 @@ CREATE TABLE Service(
     Tarif_Horaire FLOAT,
     idTypeService INT,
     CONSTRAINT lien_projet_service FOREIGN KEY (idService) REFERENCES Projet (idService)
-        ON DELETE CASCADE
+        ON DELETE SET NULL
+        ON UPDATE CASCADE,
+    CONSTRAINT lien_service_typeservice FOREIGN KEY (idTypeService) REFERENCES TypeService (idTypeService)
+        ON DELETE SET NULL
         ON UPDATE CASCADE
 );
 
 CREATE TABLE TypeService(
     idTypeService INT AUTO_INCREMENT PRIMARY KEY,
-    Nom VARCHAR(50),
-    CONSTRAINT lien_service_typeservice FOREIGN KEY (idTypeService) REFERENCES Service (idTypeService)
+    Nom VARCHAR(50)
 );
 
 CREATE TABLE Commande(
@@ -102,7 +104,7 @@ CREATE TABLE Commande(
     idUtilisateur INT,
     idFacture INT,
     CONSTRAINT lien_utlisateur_commande FOREIGN KEY (idCommande) REFERENCES Utilisateur (idCommande)
-        ON DELETE CASCADE
+        ON DELETE SET NULL
         ON UPDATE CASCADE
 );
 
@@ -111,7 +113,7 @@ CREATE TABLE Facture(
     Date_Facture DATE,
     Statut VARCHAR(50),
     CONSTRAINT lien_commande_facture FOREIGN KEY (idFacture) REFERENCES Commande (idFacture)
-        ON DELETE CASCADE
+        ON DELETE SET NULL
         ON UPDATE CASCADE
 );
 
@@ -120,7 +122,7 @@ CREATE TABLE Commande_produit(
     idProduit INT,
     CONSTRAINT CLE_PRI PRIMARY KEY (idCommande,idProduit),
     CONSTRAINT lien_commande_commandeproduit FOREIGN KEY (idCommande) REFERENCES Commande (idCommande)
-        ON DELETE CASCADE
+        ON DELETE SET NULL
         ON UPDATE CASCADE
 );
 
@@ -132,26 +134,21 @@ CREATE TABLE Produit(
     Stock INT,
     idTypeProduit INT,
     idFournisseur INT,
-    CONSTRAINT lien_commandeproduit_produit FOREIGN KEY (idProduit) REFERENCES Commande_produit(idProduit)
-        ON DELETE CASCADE
+    CONSTRAINT lien_produit_typeproduit FOREIGN KEY (idTypeProduit) REFERENCES Type_produit (idTypeProduit),
+    CONSTRAINT lien_produit_fournisseur FOREIGN KEY (idFournisseur) REFERENCES Fournisseur (idFournisseur)
+        ON DELETE SET NULL
         ON UPDATE CASCADE
 );
 
 CREATE TABLE Type_produit(
     idTypeProduit INT AUTO_INCREMENT PRIMARY KEY,
-    Nom VARCHAR(50),
-    CONSTRAINT lien_produit_typeproduit FOREIGN KEY (idTypeProduit) REFERENCES Produit (idTypeProduit)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
+    Nom VARCHAR(50)
 );
 
 CREATE TABLE Fournisseur(
     idFournisseur INT AUTO_INCREMENT PRIMARY KEY,
     Nom VARCHAR(50),
     Adresse VARCHAR(150),
-    Telephone VARCHAR(10) NOT NULL,
-    Email VARCHAR(250),
-    CONSTRAINT lien_produit_fournisseur FOREIGN KEY (idFournisseur) REFERENCES Produit (idFournisseur)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
+    Telephone VARCHAR(15) NOT NULL,
+    Email VARCHAR(250)
 );
