@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
     $password = $_POST['password'];
 
     $stmt = $connection->prepare("
-        SELECT u.idUtilisateur, u.MotDePasseHash, r.idRole, r.description
+        SELECT u.idUtilisateur, u.Mot_De_Passe_Hash, r.idRole, r.description
         FROM utilisateur u
         JOIN Role r ON u.idRole = r.idRole
         WHERE u.Email = ?
@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
             $_SESSION['email'] = $email;
             $_SESSION['idRole'] = $role_id;
             $_SESSION['role_description'] = $role_description;
-            header("Location: dashboard.php");
+            header("Location: redirect_role.php");
             exit();
         } else {
             $message = "Email ou mot de passe incorrect.";
@@ -40,13 +40,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
 }
 $connection->close();
 ?>
-
-
 <!DOCTYPE html>
 <html>
 <head>
     <title>Connexion ou Inscription</title>
-    <!-- Inclusion de Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
 </head>
 <body>

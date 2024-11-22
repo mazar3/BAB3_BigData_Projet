@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
             $defaultRoleId = 4;
 
             $stmt = $connection->prepare("
-                INSERT INTO utilisateur (Email, MotDePasseHash, Nom, Prenom, Telephone, idRole)
+                INSERT INTO utilisateur (Email, Mot_De_Passe_Hash, Nom, Prenom, Telephone, idRole)
                 VALUES (?, ?, ?, ?, ?, ?)
             ");
             $stmt->bind_param("sssssi", $email, $passwordHash, $nom, $prenom, $telephone, $defaultRoleId);
@@ -98,9 +98,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
     </form>
 
     <script>
-        // Fonction pour empêcher l'entrée de caractères non numériques
         function validatePhoneInput(input) {
-            input.value = input.value.replace(/[^0-9]/g, ''); // Remplace tout caractère non numérique par rien
+            input.value = input.value.replace(/[^0-9]/g, '');
         }
     </script>
     <p>Déjà inscrit ? <a href="login.php">Connectez-vous ici</a></p>

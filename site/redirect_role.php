@@ -10,16 +10,16 @@ $role_description = $_SESSION['role_description'];
 
 switch ($role_description) {
     case 'Administrateur':
-        header("Location: admin_dashboard.php");
+        header("Location: admin/dashboard.php");
         break;
     case 'Responsable de projet':
-        header("Location: manager_dashboard.php");
+        header("Location: manager/dashboard.php");
         break;
     case 'Collaborateur':
-        header("Location: collaborator_dashboard.php");
+        header("Location: collaborator/dashboard.php");
         break;
     case 'Client':
-        header("Location: client_dashboard.php");
+        header("Location: client/dashboard.php");
         break;
     default:
         echo "Rôle non reconnu.";

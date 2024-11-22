@@ -2,22 +2,19 @@
 global $connection;
 session_start();
 
-// Vérifier si l'utilisateur est connecté et est un Administrateur
 if (!isset($_SESSION['user_id']) || !isset($_SESSION['role_description']) || $_SESSION['role_description'] !== 'Administrateur') {
-    header("Location: login.php");
+    header("Location: ../login.php");
     exit();
 }
 
-include 'db_connect.php';
+include '../db_connect.php';
 
 $message = '';
 
-// Traitement de la mise à jour des rôles
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_role'])) {
     $user_id = intval($_POST['user_id']);
     $new_role_id = intval($_POST['idRole']);
 
-    // Récupérer le rôle actuel de l'utilisateur cible
     $stmt = $connection->prepare("SELECT r.description FROM utilisateur u JOIN Role r ON u.idRole = r.idRole WHERE u.idUtilisateur = ?");
     $stmt->bind_param("i", $user_id);
     $stmt->execute();
@@ -84,7 +81,7 @@ $connection->close();
         <!-- Menu de navigation -->
         <ul class="navbar-nav ml-auto">
             <li class="nav-item">
-                <a class="nav-link" href="admin_dashboard.php">Accueil</a>
+                <a class="nav-link" href="dashboard.php">Accueil</a>
             </li>
             <li class="nav-item active">
                 <a class="nav-link" href="manage_users.php">Gérer les Utilisateurs <span class="sr-only">(actuel)</span></a>
@@ -96,7 +93,7 @@ $connection->close();
                 <a class="nav-link" href="view_financials.php">Voir les Informations Financières</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="logout.php">Se Déconnecter</a>
+                <a class="nav-link" href="../logout.php">Se Déconnecter</a>
             </li>
         </ul>
     </div>

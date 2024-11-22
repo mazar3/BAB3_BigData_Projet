@@ -2,19 +2,17 @@
 global $connection;
 session_start();
 
-// Vérifier si l'utilisateur est connecté
 if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
+    header("Location: ../login.php");
     exit();
 }
 
-// Vérifier si l'utilisateur a le rôle "Collaborateur"
-if (!isset($_SESSION['role_description']) || $_SESSION['role_description'] !== 'Collaborateur') {
-    header("Location: login.php");
+if (!isset($_SESSION['role_description']) || $_SESSION['role_description'] !== 'Administrateur') {
+    header("Location: ../login.php");
     exit();
 }
 
-include 'db_connect.php';
+include '../db_connect.php';
 $user_id = $_SESSION['user_id'];
 $stmt = $connection->prepare("SELECT Nom, Prenom FROM utilisateur WHERE idUtilisateur = ?");
 $stmt->bind_param("i", $user_id);
@@ -28,7 +26,7 @@ $connection->close();
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Tableau de Bord Collaborateur</title>
+    <title>Tableau de Bord Administrateur</title>
     <!-- Inclusion de Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
     <!-- Optionnel : Inclure un favicon ou d'autres métadonnées -->
@@ -44,16 +42,19 @@ $connection->close();
         <!-- Menu de navigation -->
         <ul class="navbar-nav ml-auto">
             <li class="nav-item active">
-                <a class="nav-link" href="collaborator_dashboard.php">Accueil <span class="sr-only">(actuel)</span></a>
+                <a class="nav-link" href="dashboard.php">Accueil <span class="sr-only">(actuel)</span></a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="view_products.php">Voir les Produits</a>
+                <a class="nav-link" href="manage_projects.php">Gérer les Projets</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="submit_request.php">Soumettre une Demande</a>
+                <a class="nav-link" href="manage_users.php">Gérer les Utilisateurs</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="logout.php">Se Déconnecter</a>
+                <a class="nav-link" href="view_financials.php">Voir les Informations Financières</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="../logout.php">Se Déconnecter</a>
             </li>
         </ul>
     </div>
@@ -63,11 +64,12 @@ $connection->close();
     <!-- Bienvenue à l'utilisateur -->
     <div class="jumbotron">
         <h1 class="display-4">Bienvenue, <?= htmlspecialchars($prenom . ' ' . $nom); ?>!</h1>
-        <p class="lead">Accès en lecture seule aux informations et soumission de demandes.</p>
+        <p class="lead">Accédez à vos fonctionnalités d'administration ci-dessous.</p>
         <hr class="my-4">
-        <p>Vous pouvez consulter les produits disponibles et soumettre des demandes de commandes.</p>
-        <a class="btn btn-primary btn-lg" href="view_products.php" role="button">Voir les Produits</a>
-        <a class="btn btn-success btn-lg" href="submit_request.php" role="button">Soumettre une Demande</a>
+        <p>Vous pouvez gérer les projets, les utilisateurs, et consulter les informations financières.</p>
+        <a class="btn btn-primary btn-lg" href="manage_projects.php" role="button">Gérer les Projets</a>
+        <a class="btn btn-secondary btn-lg" href="manage_users.php" role="button">Gérer les Utilisateurs</a>
+        <a class="btn btn-info btn-lg" href="view_financials.php" role="button">Voir les Informations Financières</a>
     </div>
 </div>
 
