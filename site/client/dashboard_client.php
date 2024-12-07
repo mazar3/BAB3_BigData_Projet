@@ -1,13 +1,16 @@
 <?php
+
 global $connection;
 session_start();
 
+// Vérifier si l'utilisateur est connecté
 if (!isset($_SESSION['user_id'])) {
     header("Location: ../login.php");
     exit();
 }
 
-if (!isset($_SESSION['role_description']) || $_SESSION['role_description'] !== 'Responsable de projet') {
+// Vérifier si l'utilisateur a le rôle "Client"
+if (!isset($_SESSION['role_description']) || $_SESSION['role_description'] !== 'Client') {
     header("Location: ../login.php");
     exit();
 }
@@ -26,7 +29,7 @@ $connection->close();
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Tableau de Bord Responsable de Projet</title>
+    <title>Tableau de Bord Client</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
 </head>
 <body>
@@ -39,16 +42,13 @@ $connection->close();
     <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ml-auto">
             <li class="nav-item active">
-                <a class="nav-link" href="dashboard.php">Accueil <span class="sr-only">(actuel)</span></a>
+                <a class="nav-link" href="dashboard_client.php">Accueil <span class="sr-only">(actuel)</span></a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="view_projects.php">Voir Mes Projets</a>
+                <a class="nav-link" href="view_projects.php">Consulter mes projets</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="modify_orders.php">Modifier les Commandes</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="assign_collaborators.php">Assigner des Collaborateurs</a>
+                <a class="nav-link" href="create_projects.php">Créer un projet</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="../logout.php">Se Déconnecter</a>
@@ -60,12 +60,11 @@ $connection->close();
 <div class="container mt-5">
     <div class="jumbotron">
         <h1 class="display-4">Bienvenue, <?= htmlspecialchars($prenom . ' ' . $nom); ?>!</h1>
-        <p class="lead">Accédez à vos projets et commandes spécifiques ci-dessous.</p>
+        <p class="lead">Accédez à vos services et fonctionnalités personnalisées ci-dessous.</p>
         <hr class="my-4">
-        <p>Vous pouvez consulter vos projets, modifier les commandes en cours, et assigner des collaborateurs.</p>
-        <a class="btn btn-primary btn-lg" href="view_projects.php" role="button">Voir Mes Projets</a>
-        <a class="btn btn-warning btn-lg" href="modify_orders.php" role="button">Modifier les Commandes</a>
-        <a class="btn btn-info btn-lg" href="assign_collaborators.php" role="button">Assigner des Collaborateurs</a>
+        <p>Vous pouvez consulter nos produits ou créer un projet</p>
+        <a class="btn btn-primary btn-lg" href="view_projects.php" role="button">Consulter les Produits</a>
+        <a class="btn btn-success btn-lg" href="create_projects.php" role="button">Créer un projet</a>
     </div>
 </div>
 

@@ -4,17 +4,16 @@ session_start();
 include 'db_connect.php';
 $message = '';
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['action'] == 'login') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'login') {
     $email = $_POST['email'];
     $password = $_POST['password'];
 
     $stmt = $connection->prepare("
-        SELECT u.idUtilisateur, u.Mot_De_Passe_Hash, r.idRole, r.description
-        FROM utilisateur u
+        SELECT u.idUtilisateur, u.Mot_De_Passe_Hash, r.idRole, r.Description
+        FROM Utilisateur u
         JOIN Role r ON u.idRole = r.idRole
         WHERE u.Email = ?
     ");
-
     $stmt->bind_param("s", $email);
     $stmt->execute();
     $stmt->store_result();
@@ -41,42 +40,34 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
 $connection->close();
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-    <title>Connexion ou Inscription</title>
+    <meta charset="UTF-8">
+    <title>Connexion</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
 </head>
 <body>
 <div class="container mt-5">
     <?php if ($message): ?>
-        <div class="alert alert-info" role="alert">
+        <div class="alert alert-danger" role="alert">
             <?= htmlspecialchars($message) ?>
         </div>
     <?php endif; ?>
 
-    <div class="row">
-        <!-- Formulaire de connexion -->
-        <div class="col-md-6">
-            <h2>Connexion</h2>
-            <form method="post" action="">
-                <input type="hidden" name="action" value="login">
-                <div class="form-group">
-                    <label for="emailLogin">Email</label>
-                    <input type="email" class="form-control" id="emailLogin" name="email" required>
-                </div>
-                <div class="form-group">
-                    <label for="passwordLogin">Mot de passe</label>
-                    <input type="password" class="form-control" id="passwordLogin" name="password" required>
-                </div>
-                <button type="submit" class="btn btn-primary">Se connecter</button>
-            </form>
-            <p>Pas encore de compte ? <a href="register.php">Inscrivez-vous ici</a></p>
+    <h2>Connexion</h2>
+    <form method="post" action="">
+        <input type="hidden" name="action" value="login">
+        <div class="form-group">
+            <label for="emailLogin">Email</label>
+            <input type="email" class="form-control" id="emailLogin" name="email" required>
         </div>
-    </div>
+        <div class="form-group">
+            <label for="passwordLogin">Mot de passe</label>
+            <input type="password" class="form-control" id="passwordLogin" name="password" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Se connecter</button>
+    </form>
+    <p class="mt-3">Pas encore de compte ? <a href="register.php">Inscrivez-vous ici</a></p>
 </div>
-<!-- Inclusion de Bootstrap JS et ses dépendances -->
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.bundle.min.js"></script>
-
 </body>
 </html>

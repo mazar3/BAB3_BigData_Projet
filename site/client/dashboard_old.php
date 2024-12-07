@@ -1,4 +1,5 @@
 <?php
+
 global $connection;
 session_start();
 
@@ -41,7 +42,7 @@ $connection->close();
     <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ml-auto">
             <li class="nav-item active">
-                <a class="nav-link" href="dashboard.php">Accueil <span class="sr-only">(actuel)</span></a>
+                <a class="nav-link" href="dashboard_client.php">Accueil <span class="sr-only">(actuel)</span></a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="view_products.php">Consulter les Produits</a>

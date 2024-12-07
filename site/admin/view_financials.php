@@ -134,7 +134,7 @@ $connection->close();
         <!-- Menu de navigation -->
         <ul class="navbar-nav ml-auto">
             <li class="nav-item">
-                <a class="nav-link" href="dashboard.php">Accueil</a>
+                <a class="nav-link" href="dashboard_admin.php">Accueil</a>
             </li>
             <li class="nav-item active">
                 <a class="nav-link" href="view_financials.php">Informations Financières <span class="sr-only">(actuel)</span></a>
