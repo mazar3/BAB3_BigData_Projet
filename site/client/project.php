@@ -266,13 +266,19 @@ $connection->close();
                         <p class="mt-3">Vous avez accepté le devis. Le projet est maintenant terminé.</p>
                         <p>Voici votre facture (PDF) :</p>
                         <!-- Faux bouton de téléchargement de la facture -->
-                        <button class="btn btn-info">Télécharger la Facture (PDF)</button>
-                        <p class="mt-3">Veuillez effectuer le paiement par virement bancaire sur le compte suivant :</p>
-                        <ul>
-                            <li><strong>IBAN :</strong> FR76 1234 5678 9012 3456 7890 189</li>
-                            <li><strong>BIC :</strong> ABCD1234XXX</li>
-                        </ul>
-                        <p>Merci de votre confiance.</p>
+<!--                        <button class="btn btn-info">Télécharger la Facture (PDF)</button>-->
+                        <a href="../client/facture moi.php?idProjet=<?= urlencode($idProjet) ?>" class="btn btn-info" target="_blank">Télécharger la Facture (PDF)</a>
+
+
+                        <?php
+                        echo '<p class="mt-3">Veuillez effectuer le paiement par virement bancaire sur le compte suivant :</p>
+                            <ul>
+                                <li><strong>IBAN :</strong> BE76 1234 5678 9012 </li>
+                                <li><strong>BIC :</strong> ABCD1234XXX</li>
+                                <li><strong>Commentaire :</strong> ' . htmlspecialchars($user_id . '-' . $idProjet) . '</li>
+                            </ul>
+                            <p>Merci de votre confiance.</p>';
+                        ?>
                     <?php elseif ($project['Statut'] === 'Refusé'): ?>
                         <p class="mt-3">Vous avez refusé le devis. Le projet est marqué comme refusé.</p>
                     <?php endif; ?>
