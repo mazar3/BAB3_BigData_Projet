@@ -1,174 +1,123 @@
 <?php
+// admin/dashboard_manager.php
 global $connection;
-session_start();
+include '../header.php';
 include '../db_connect.php';
 
-// Vérifier que l'utilisateur est connecté
-if (!isset($_SESSION['user_id'])) {
+// Vérifier si l'utilisateur est connecté et a le rôle "Responsable de projet"
+if (!isset($_SESSION['user_id']) || get_role() !== 'Responsable de projet') {
     header("Location: ../login.php");
     exit();
 }
 
-// Vérifier que l'utilisateur a le rôle de responsable de projet
-if (!isset($_SESSION['role_description']) || $_SESSION['role_description'] !== 'Responsable de projet') {
-    echo "Accès refusé. Vous n'avez pas les permissions nécessaires.";
-    exit();
-}
+$manager_id = $_SESSION['user_id'];
 
-$user_id = $_SESSION['user_id'];
-
-// Récupérer la liste des projets assignés à ce manager
-// On suppose que la table 'Projet' possède une colonne 'idResponsable' qui stocke l'ID de l'utilisateur manager
+// Récupérer la liste des projets assignés au manager
 $stmt = $connection->prepare("
-    SELECT idProjet, Nom, Date_Debut, Statut
-    FROM Projet
-    WHERE idResponsable = ?
-    ORDER BY Date_Debut DESC
+    SELECT 
+        p.idProjet, 
+        p.Nom AS ProjetNom, 
+        p.Description, 
+        p.Statut, 
+        DATE_FORMAT(p.Date_Debut, '%d/%m/%Y') AS DateDebutFormat
+    FROM Projet p
+    JOIN Projet_manager pm ON p.idProjet = pm.idProjet
+    WHERE pm.idUtilisateur = ?
+    ORDER BY p.idProjet DESC
 ");
-$stmt->bind_param("i", $user_id);
+$stmt->bind_param("i", $manager_id);
 $stmt->execute();
 $result = $stmt->get_result();
-
 $projects = [];
 while ($row = $result->fetch_assoc()) {
     $projects[] = $row;
 }
 $stmt->close();
+
+// Récupérer les alertes sur les stocks faibles (stock < 10)
+$stmt = $connection->prepare("
+    SELECT COUNT(*) 
+    FROM Produit 
+    WHERE Stock < 10
+");
+$stmt->execute();
+$stmt->bind_result($low_stock_count);
+$stmt->fetch();
+$stmt->close();
+
 $connection->close();
 ?>
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Tableau de Bord Manager - FactoDB</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <!-- Lien vers Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
-    <style>
-        body {
-            background: #f8f9fa;
-        }
-        .navbar {
-            background-color: #ffffff;
-            border-bottom: 1px solid #e2e2e2;
-        }
-        .navbar .navbar-brand {
-            font-weight: bold;
-            font-size: 1.2rem;
-        }
-        .navbar-nav .nav-link {
-            color: #555;
-        }
-        .navbar-nav .nav-link.active {
-            font-weight: 600;
-            color: #000;
-        }
-        .content {
-            margin-top: 60px;
-        }
-        .content h1 {
-            font-size: 2rem;
-            margin-bottom: 20px;
-            font-weight: 700;
-            color: #333;
-        }
-        .content p {
-            font-size: 1.1rem;
-            margin-bottom: 30px;
-            color: #555;
-        }
-        .table thead th {
-            font-weight: 600;
-            background: #f1f1f1;
-        }
-        .status-badge {
-            font-size: 0.9rem;
-            padding: 4px 8px;
-            border-radius: 4px;
-            color: #fff;
-        }
-        .status-encours {
-            background-color: #ffc107;
-        }
-        .status-valide {
-            background-color: #28a745;
-        }
-        .status-refuse {
-            background-color: #dc3545;
-        }
-    </style>
-</head>
-<body>
 
-<!-- Navbar Manager -->
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="dashboard_manager.php">FactoDB</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
-            aria-controls="navbarNav" aria-expanded="false" aria-label="Basculer la navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-        <!-- Menu de navigation -->
-        <ul class="navbar-nav ml-auto">
-            <li class="nav-item active">
-                <a class="nav-link" href="dashboard_manager.php">Mes Projets <span class="sr-only">(actuel)</span></a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="../logout.php">Se Déconnecter</a>
-            </li>
-        </ul>
+<div class="container mt-5">
+    <h1 class="mb-4">Tableau de Bord Manager</h1>
+
+    <!-- Alertes sur les stocks faibles -->
+    <?php if ($low_stock_count > 0): ?>
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            Il y a <?= htmlspecialchars($low_stock_count) ?> produit(s) en rupture de stock.
+            <button type="button" class="close" data-dismiss="alert" aria-label="Fermer">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    <?php endif; ?>
+
+    <!-- Liste des projets du manager -->
+    <div class="card">
+        <div class="card-header">
+            <h3>Mes Projets</h3>
+        </div>
+        <div class="card-body">
+            <?php if (count($projects) === 0): ?>
+                <p>Aucun projet assigné.</p>
+            <?php else: ?>
+                <div class="table-responsive">
+                    <table id="projectsTable" class="table table-striped table-bordered">
+                        <thead class="thead-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Nom du Projet</th>
+                            <th>Description</th>
+                            <th>Statut</th>
+                            <th>Date de Début</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <?php foreach ($projects as $project): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($project['idProjet']) ?></td>
+                                <td><?= htmlspecialchars($project['ProjetNom']) ?></td>
+                                <td><?= htmlspecialchars(substr($project['Description'], 0, 100)) ?><?= strlen($project['Description']) > 100 ? '...' : '' ?></td>
+                                <td><?= htmlspecialchars($project['Statut']) ?></td>
+                                <td><?= htmlspecialchars($project['DateDebutFormat']) ?></td>
+                                <td>
+                                    <a href="project.php?idProjet=<?= htmlspecialchars($project['idProjet']) ?>" class="btn btn-sm btn-primary">Accéder au Projet</a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php endif; ?>
+        </div>
     </div>
-</nav>
-
-<div class="container content">
-    <h1>Mes Projets</h1>
-    <p>Ci-dessous, la liste de tous les projets qui vous sont assignés.</p>
-
-    <table class="table table-striped table-bordered">
-        <thead>
-        <tr>
-            <th>ID Projet</th>
-            <th>Nom du Projet</th>
-            <th>Date de Début</th>
-            <th>Statut</th>
-            <th>Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        <?php if (count($projects) > 0): ?>
-            <?php foreach ($projects as $project): ?>
-                <?php
-                // Déterminer le badge de statut
-                $statut = $project['Statut'];
-                $badgeClass = 'status-encours'; // Valeur par défaut
-                if (strtolower($statut) === 'validé') {
-                    $badgeClass = 'status-valide';
-                } elseif (strtolower($statut) === 'refusé') {
-                    $badgeClass = 'status-refuse';
-                }
-                ?>
-                <tr>
-                    <td><?= htmlspecialchars($project['idProjet']) ?></td>
-                    <td><?= htmlspecialchars($project['Nom']) ?></td>
-                    <td><?= htmlspecialchars($project['Date_Debut']) ?></td>
-                    <td><span class="status-badge <?= $badgeClass ?>"><?= htmlspecialchars($statut) ?></span></td>
-                    <td>
-                        <a href="project.php?id=<?= urlencode($project['idProjet']) ?>" class="btn btn-sm btn-primary">Accéder au projet</a>
-                    </td>
-                </tr>
-            <?php endforeach; ?>
-        <?php else: ?>
-            <tr>
-                <td colspan="5" class="text-center">Aucun projet ne vous est assigné pour le moment.</td>
-            </tr>
-        <?php endif; ?>
-        </tbody>
-    </table>
 </div>
 
-<!-- Inclusion de Bootstrap JS et ses dépendances -->
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Intégration de DataTables CSS et JS via CDN -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
-</body>
-</html>
+<script>
+    $(document).ready(function() {
+        $('#projectsTable').DataTable({
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/French.json"
+            },
+            "pageLength": 10,
+            "lengthMenu": [5, 10, 25, 50, 100]
+        });
+    });
+</script>
+
+<?php include '../footer.php'; ?>

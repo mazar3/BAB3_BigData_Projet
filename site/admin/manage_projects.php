@@ -1,133 +1,174 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Gérer les Projets - FactoDB</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <!-- Lien vers Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
-    <style>
-        body {
-            background: #f8f9fa;
-        }
-        .navbar {
-            background-color: #ffffff;
-            border-bottom: 1px solid #e2e2e2;
-        }
-        .navbar .navbar-brand {
-            font-weight: bold;
-            font-size: 1.2rem;
-        }
-        .navbar-nav .nav-link {
-            color: #555;
-        }
-        .navbar-nav .nav-link.active {
-            font-weight: 600;
-            color: #000;
-        }
-        .content {
-            margin-top: 60px;
-        }
-        .content h1 {
-            font-size: 2rem;
-            margin-bottom: 20px;
-            font-weight: 700;
-            color: #333;
-        }
-        .content p {
-            font-size: 1.1rem;
-            margin-bottom: 30px;
-            color: #555;
-        }
-        .table thead th {
-            font-weight: 600;
-            background: #f1f1f1;
-        }
-    </style>
-</head>
-<body>
+<?php
+// admin/manage_projects.php
+global $connection;
+include '../header.php';
+include '../db_connect.php';
 
-<!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="dashboard_admin.php">FactoDB</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
-            aria-controls="navbarNav" aria-expanded="false" aria-label="Basculer la navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ml-auto">
-            <li class="nav-item">
-                <a class="nav-link" href="dashboard_admin.php">Accueil</a>
-            </li>
-            <li class="nav-item active">
-                <a class="nav-link" href="manage_projects.php">Gérer les Projets <span class="sr-only">(actuel)</span></a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="manage_users.php">Gérer les Utilisateurs</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="view_financials.php">Voir les Informations Financières</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="../logout.php">Se Déconnecter</a>
-            </li>
-        </ul>
-    </div>
-</nav>
+// Vérifier si l'utilisateur est connecté et a le rôle "Administrateur"
+if (!isset($_SESSION['user_id']) || get_role() !== 'Administrateur') {
+    header("Location: ../login.php");
+    exit();
+}
 
-<div class="container content">
-    <h1>Gérer les Projets</h1>
-    <p>Liste des projets en cours. Vous pouvez affecter un projet à un ou plusieurs responsables.</p>
+// Traitement de la suppression d'un projet
+$delete_message = '';
+$delete_success = false;
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'delete_project') {
+    $delete_project_id = intval($_POST['project_id']);
 
-    <table class="table table-striped table-bordered">
-        <thead>
-        <tr>
-            <th>ID Projet</th>
-            <th>Nom du Projet</th>
-            <th>Date de Début</th>
-            <th>Date de Fin</th>
-            <th>Statut</th>
-            <th>Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        <?php
-        // Connexion à la base de données
-        $conn = new mysqli("localhost", "root", "", "bab3_bigdata_projet");
-        if ($conn->connect_error) {
-            die("Erreur de connexion : " . $conn->connect_error);
-        }
+    // Supprimer les associations dans Projet_manager
+    $stmt = $connection->prepare("DELETE FROM Projet_manager WHERE idProjet = ?");
+    $stmt->bind_param("i", $delete_project_id);
+    if ($stmt->execute()) {
+        $stmt->close();
 
-        // Requête pour récupérer les projets en cours
-        $sql = "SELECT idProjet, Nom, Date_Debut, Date_Fin, Statut FROM Projet WHERE Statut = 'En cours'";
-        $result = $conn->query($sql);
-
-        if ($result->num_rows > 0) {
-            while ($row = $result->fetch_assoc()) {
-                echo "<tr>
-                            <td>" . htmlspecialchars($row['idProjet']) . "</td>
-                            <td>" . htmlspecialchars($row['Nom']) . "</td>
-                            <td>" . htmlspecialchars($row['Date_Debut']) . "</td>
-                            <td>" . htmlspecialchars($row['Date_Fin']) . "</td>
-                            <td>" . htmlspecialchars($row['Statut']) . "</td>
-                            <td>
-                                <a href='assign_manager.php?id=" . urlencode($row['idProjet']) . "' class='btn btn-sm btn-primary'>Affecter Responsable</a>
-                            </td>
-                          </tr>";
-            }
+        // Supprimer le projet
+        $stmt = $connection->prepare("DELETE FROM Projet WHERE idProjet = ?");
+        $stmt->bind_param("i", $delete_project_id);
+        if ($stmt->execute()) {
+            $delete_message = "Projet supprimé avec succès.";
+            $delete_success = true;
         } else {
-            echo "<tr><td colspan='6' class='text-center'>Aucun projet en cours.</td></tr>";
+            $delete_message = "Erreur lors de la suppression du projet : " . htmlspecialchars($stmt->error);
         }
+    } else {
+        $delete_message = "Erreur lors de la suppression des associations du projet : " . htmlspecialchars($stmt->error);
+    }
+    $stmt->close();
+}
 
-        $conn->close();
-        ?>
-        </tbody>
-    </table>
+// Récupérer la liste des projets avec les informations du client et des responsables
+$stmt = $connection->prepare("
+    SELECT 
+        p.idProjet, 
+        p.Nom AS ProjetNom, 
+        p.Description, 
+        p.Statut, 
+        DATE_FORMAT(p.Date_Debut, '%d/%m/%Y') AS DateDebutFormat, 
+        u.Nom AS ClientNom, 
+        u.Prenom AS ClientPrenom
+    FROM Projet p
+    JOIN Utilisateur u ON p.idUtilisateur = u.idUtilisateur
+    ORDER BY p.idProjet DESC
+");
+$stmt->execute();
+$result = $stmt->get_result();
+$projects = [];
+while ($row = $result->fetch_assoc()) {
+    // Récupérer les responsables pour chaque projet
+    $project_id = $row['idProjet'];
+    $stmt_managers = $connection->prepare("
+        SELECT u.Nom, u.Prenom
+        FROM Projet_manager pm
+        JOIN Utilisateur u ON pm.idUtilisateur = u.idUtilisateur
+        JOIN Role r ON u.idRole = r.idRole
+        WHERE pm.idProjet = ? AND r.Description = 'Responsable de projet'
+    ");
+    $stmt_managers->bind_param("i", $project_id);
+    $stmt_managers->execute();
+    $result_managers = $stmt_managers->get_result();
+    $managers = [];
+    while ($manager = $result_managers->fetch_assoc()) {
+        $managers[] = $manager['Prenom'] . ' ' . $manager['Nom'];
+    }
+    $row['Managers'] = $managers;
+    $projects[] = $row;
+    $stmt_managers->close();
+}
+$stmt->close();
+
+// Récupérer la liste des responsables (managers) pour les assignations éventuelles
+$stmt = $connection->prepare("
+    SELECT u.idUtilisateur, u.Prenom, u.Nom
+    FROM Utilisateur u
+    JOIN Role r ON u.idRole = r.idRole
+    WHERE r.Description = 'Responsable de projet'
+    ORDER BY u.Prenom ASC, u.Nom ASC
+");
+$stmt->execute();
+$result = $stmt->get_result();
+$available_managers = [];
+while ($row = $result->fetch_assoc()) {
+    $available_managers[] = $row;
+}
+$stmt->close();
+
+$connection->close();
+?>
+
+<div class="container mt-5">
+    <h1 class="mb-4">Gestion des Projets</h1>
+
+    <!-- Messages de confirmation -->
+    <?php if ($delete_message): ?>
+        <div class="alert <?= $delete_success ? 'alert-success' : 'alert-danger' ?> alert-dismissible fade show" role="alert">
+            <?= htmlspecialchars($delete_message) ?>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Fermer">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    <?php endif; ?>
+
+    <!-- Table des projets -->
+    <div class="card">
+        <div class="card-header">
+            <h3>Liste des Projets</h3>
+        </div>
+        <div class="card-body">
+            <?php if (count($projects) === 0): ?>
+                <p>Aucun projet trouvé.</p>
+            <?php else: ?>
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered">
+                        <thead class="thead-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Nom du Projet</th>
+                            <th>Description</th>
+                            <th>Statut</th>
+                            <th>Date de Début</th>
+                            <th>Client</th>
+                            <th>Responsables</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <?php foreach ($projects as $project): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($project['idProjet']) ?></td>
+                                <td><?= htmlspecialchars($project['ProjetNom']) ?></td>
+                                <td><?= htmlspecialchars(substr($project['Description'], 0, 100)) ?><?= strlen($project['Description']) > 100 ? '...' : '' ?></td>
+                                <td><?= htmlspecialchars($project['Statut']) ?></td>
+                                <td><?= htmlspecialchars($project['DateDebutFormat']) ?></td>
+                                <td><?= htmlspecialchars($project['ClientPrenom'] . ' ' . $project['ClientNom']) ?></td>
+                                <td>
+                                    <?php
+                                    if (count($project['Managers']) > 0) {
+                                        echo htmlspecialchars(implode(', ', $project['Managers']));
+                                    } else {
+                                        echo 'Aucun responsable assigné.';
+                                    }
+                                    ?>
+                                </td>
+                                <td>
+                                    <!-- Bouton d'édition -->
+                                    <a href="edit_project.php?id=<?= htmlspecialchars($project['idProjet']) ?>" class="btn btn-sm btn-warning mb-1">Éditer</a>
+
+                                    <!-- Bouton de suppression -->
+                                    <form method="post" action="" style="display:inline-block;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce projet ?');">
+                                        <input type="hidden" name="action" value="delete_project">
+                                        <input type="hidden" name="project_id" value="<?= htmlspecialchars($project['idProjet']) ?>">
+                                        <button type="submit" class="btn btn-sm btn-danger">Supprimer</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php endif; ?>
+        </div>
+    </div>
 </div>
 
-<!-- Inclusion de Bootstrap JS et ses dépendances -->
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.bundle.min.js"></script>
-
-</body>
-</html>
+<?php include '../footer.php'; ?>

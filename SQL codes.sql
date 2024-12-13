@@ -190,3 +190,30 @@ CREATE TABLE Commande_produit(
                                      ON DELETE CASCADE
                                      ON UPDATE CASCADE
 ) ENGINE=InnoDB;
+
+CREATE TABLE Commentaires (
+                              idCommentaire INT AUTO_INCREMENT PRIMARY KEY,
+                              idProjet INT NOT NULL,
+                              idUtilisateur INT NOT NULL,
+                              Commentaire TEXT NOT NULL,
+                              Date_Commentaire DATETIME DEFAULT CURRENT_TIMESTAMP,
+                              CONSTRAINT fk_commentaires_projet FOREIGN KEY (idProjet) REFERENCES Projet(idProjet) ON DELETE CASCADE,
+                              CONSTRAINT fk_commentaires_utilisateur FOREIGN KEY (idUtilisateur) REFERENCES Utilisateur(idUtilisateur) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE Projet_manager (
+                                idProjet INT NOT NULL,
+                                idUtilisateur INT NOT NULL,
+                                PRIMARY KEY (idProjet, idUtilisateur),
+                                CONSTRAINT fk_projet_manager_projet FOREIGN KEY (idProjet) REFERENCES Projet(idProjet) ON DELETE CASCADE ON UPDATE CASCADE,
+                                CONSTRAINT fk_projet_manager_utilisateur FOREIGN KEY (idUtilisateur) REFERENCES Utilisateur(idUtilisateur) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE Panier_produit (
+                                idPanier INT NOT NULL,
+                                idProduit INT NOT NULL,
+                                Quantite INT NOT NULL,
+                                PRIMARY KEY (idPanier, idProduit),
+                                CONSTRAINT fk_paniers_produit FOREIGN KEY (idPanier) REFERENCES Panier(idPanier) ON DELETE CASCADE,
+                                CONSTRAINT fk_paniers_produit_produit FOREIGN KEY (idProduit) REFERENCES Produit(idProduit) ON DELETE CASCADE
+) ENGINE=InnoDB;

@@ -30,3 +30,15 @@
             - Un bouton "Valider et envoyer le devis au client"
             - Un tableau avec tous les produits du site et une dernière colonne avec un champs nombre + un bouton "Ajouter au projet"
                 - Ca ajoute au premier tableau ("le panier")
+
+
+Je vois des problèmes avec le header et le footer. Pour le footer fais en sorte qu'il soit fixé au bas de la fenêtre.
+
+
+Exemple de Scénario d’Utilisation :
+
+L’Administrateur se connecte, va dans "Gestion des Utilisateurs" et ajoute un nouveau "Manager" avec des droits spécifiques (gérer produits, services, clients, factures, mais pas les utilisateurs).
+Le Manager se connecte, ajoute un nouveau projet pour un client existant, lui assigne des produits (PC, licences logicielles) et des services (installation, maintenance). Ensuite, il génère un devis basé sur le projet.
+Le Client se connecte de son côté et consulte le devis généré par le manager. Il peut le valider, ce qui génère automatiquement la facture. Il télécharge sa facture au format PDF.
+Le Fournisseur se connecte et voit qu’il a une nouvelle commande de 100 PC à livrer. Il met à jour le statut de la livraison à "En cours".
+L’Employé du support technique se connecte, vérifie les projets en cours et met à jour l’état d’installation ou de maintenance des services.
