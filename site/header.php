@@ -32,29 +32,34 @@ function get_dashboard_link() {
     <meta charset="UTF-8">
     <title>FactoDB</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <!-- DataTables CSS -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-    <!-- Bootstrap CSS (si utilisé) -->
+
+    <!-- Bootstrap CSS (version 4.5.2) -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <!-- Lien vers un fichier CSS personnalisé -->
-    <link rel="stylesheet" href="styles.css">
 
     <!-- DataTables CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <!-- DataTables Responsive CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">
 
-    <!-- jQuery -->
+    <!-- Lien vers un fichier CSS personnalisé -->
+    <link rel="stylesheet" href="styles.css">
+    <!-- jQuery (déjà inclus) -->
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+    <!-- Popper.js -->
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
     <!-- DataTables JS -->
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <!-- DataTables Responsive JS -->
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
-    <!-- DataTables French Language -->
-    <script src="https://cdn.datatables.net/plug-ins/1.13.6/i18n/French.json"></script>
 
+
+    <!-- Styles additionnels pour personnaliser la page -->
     <style>
-        /* Styles additionnels pour personnaliser la page */
         html, body {
             height: 100%;
             margin: 0;

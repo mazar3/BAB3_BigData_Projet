@@ -9,9 +9,9 @@
     <div class="container text-center">
         <p class="text-white">&copy; <?php echo date("Y"); ?> FactoDB. Tous droits réservés.</p>
         <p>
-            <a href="#" class="text-white">À propos</a> |
-            <a href="#" class="text-white">Contact</a> |
-            <a href="#" class="text-white">FAQ</a>
+            <a href="../about.php" class="text-white">À propos</a> |
+            <a href="../contact.php" class="text-white">Contact</a> |
+            <a href="../faq.php" class="text-white">FAQ</a>
         </p>
     </div>
 </footer>
@@ -21,3 +21,5 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-1CmrxMRARb6aLqgBO7yyAxTOQE2AKb9GfXnEw5L9uKXmv3p3Hv/hH39i0H0YON87" crossorigin="anonymous"></script>
 </body>
 </html>
+
+

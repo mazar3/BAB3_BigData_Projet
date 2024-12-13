@@ -12,5 +12,6 @@
     <orderEntry type="library" name="tableexport.jquery.plugin" level="application" />
     <orderEntry type="library" name="dataTables.responsive" level="application" />
     <orderEntry type="library" name="responsive.dataTables" level="application" />
+    <orderEntry type="library" name="popper.js" level="application" />
   </component>
 </module>
