@@ -112,13 +112,13 @@ $connection->close();
 ?>
 
 <div class="container mt-5">
-    <h1 class="mb-4">Tableau de Bord Administrateur</h1>
+    <h1 class="mb-4">Tableau de bord - Administrateur</h1>
 
     <div class="row">
         <!-- Carte des utilisateurs -->
         <div class="col-md-4">
             <div class="card text-white bg-primary mb-3">
-                <div class="card-header">Total Utilisateurs</div>
+                <div class="card-header">Total utilisateurs</div>
                 <div class="card-body">
                     <h5 class="card-title"><?= htmlspecialchars($total_users) ?></h5>
                 </div>
@@ -128,7 +128,7 @@ $connection->close();
         <!-- Carte des projets -->
         <div class="col-md-4">
             <div class="card text-white bg-success mb-3">
-                <div class="card-header">Total Projets</div>
+                <div class="card-header">Total projets</div>
                 <div class="card-body">
                     <h5 class="card-title"><?= htmlspecialchars($total_projects) ?></h5>
                 </div>
@@ -138,7 +138,7 @@ $connection->close();
         <!-- Carte des produits -->
         <div class="col-md-4">
             <div class="card text-white bg-info mb-3">
-                <div class="card-header">Total Produits</div>
+                <div class="card-header">Total produits</div>
                 <div class="card-body">
                     <h5 class="card-title"><?= htmlspecialchars($total_products) ?></h5>
                 </div>
@@ -150,7 +150,7 @@ $connection->close();
         <!-- Carte du stock total -->
         <div class="col-md-6">
             <div class="card text-white bg-warning mb-3">
-                <div class="card-header">Stock Total</div>
+                <div class="card-header">Stock total</div>
                 <div class="card-body">
                     <h5 class="card-title"><?= htmlspecialchars($total_stock) ?> unités</h5>
                 </div>
@@ -160,7 +160,7 @@ $connection->close();
         <!-- Carte des produits en rupture de stock -->
         <div class="col-md-6">
             <div class="card text-white bg-danger mb-3">
-                <div class="card-header">Produits en Rupture de Stock</div>
+                <div class="card-header">Produits en rupture de stock</div>
                 <div class="card-body">
                     <h5 class="card-title"><?= htmlspecialchars($low_stock_products) ?></h5>
                 </div>
@@ -171,7 +171,7 @@ $connection->close();
     <!-- Section des utilisateurs par rôle -->
     <div class="row">
         <div class="col-md-6">
-            <h3>Utilisateurs par Rôle</h3>
+            <h3>Utilisateurs par rôle</h3>
             <ul class="list-group">
                 <?php foreach ($users_by_role as $role => $count): ?>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -184,7 +184,7 @@ $connection->close();
 
         <!-- Section des projets par statut -->
         <div class="col-md-6">
-            <h3>Projets par Statut</h3>
+            <h3>Projets par statut</h3>
             <ul class="list-group">
                 <?php foreach ($projects_by_status as $status => $count): ?>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -199,7 +199,7 @@ $connection->close();
     <!-- Section des produits par type -->
     <div class="row mt-4">
         <div class="col-md-6">
-            <h3>Produits par Type</h3>
+            <h3>Produits par type</h3>
             <ul class="list-group">
                 <?php foreach ($products_by_type as $type => $count): ?>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -212,7 +212,7 @@ $connection->close();
 
         <!-- Section des produits par fournisseur -->
         <div class="col-md-6">
-            <h3>Produits par Fournisseur</h3>
+            <h3>Produits par fournisseur</h3>
             <ul class="list-group">
                 <?php foreach ($products_by_supplier as $fournisseur => $count): ?>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -228,9 +228,9 @@ $connection->close();
     <div class="mt-5">
         <h3>Gestion</h3>
         <div class="list-group">
-            <a href="manage_users.php" class="list-group-item list-group-item-action">Gestion des Utilisateurs</a>
-            <a href="manage_projects.php" class="list-group-item list-group-item-action">Gestion des Projets</a>
-            <a href="manage_products.php" class="list-group-item list-group-item-action">Gestion des Produits</a>
+            <a href="manage_users.php" class="list-group-item list-group-item-action">Gestion des utilisateurs</a>
+            <a href="manage_projects.php" class="list-group-item list-group-item-action">Gestion des projets</a>
+            <a href="manage_products.php" class="list-group-item list-group-item-action">Gestion des produits</a>
             <!-- Ajoutez d'autres liens de gestion selon vos besoins -->
         </div>
     </div>

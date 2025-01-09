@@ -157,11 +157,11 @@ $connection->close();
 ?>
 
 <div class="container mt-5">
-    <h1 class="mb-4">Éditer le Projet</h1>
+    <h1 class="mb-4">Éditer le projet</h1>
 
     <div class="card">
         <div class="card-header">
-            <h3>Modifier les Détails du Projet</h3>
+            <h3>Modifier les détails du projet</h3>
         </div>
         <div class="card-body">
             <?php if ($edit_message): ?>
@@ -177,17 +177,17 @@ $connection->close();
                 <input type="hidden" name="action" value="edit_project">
 
                 <div class="form-group">
-                    <label for="nom">Nom du Projet</label>
+                    <label for="nom">Nom du projet</label>
                     <input type="text" class="form-control" id="nom" name="nom" value="<?= htmlspecialchars($nom) ?>" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="description">Description du Projet</label>
+                    <label for="description">Description du projet</label>
                     <textarea class="form-control" id="description" name="description" rows="5" required><?= htmlspecialchars($description) ?></textarea>
                 </div>
 
                 <div class="form-group">
-                    <label for="statut">Statut du Projet</label>
+                    <label for="statut">Statut du projet</label>
                     <select class="form-control" id="statut" name="statut" required>
                         <option value="En cours de validation" <?= ($statut === 'En cours de validation') ? 'selected' : '' ?>>En cours de validation</option>
                         <option value="Validé" <?= ($statut === 'Validé') ? 'selected' : '' ?>>Validé</option>
@@ -197,12 +197,12 @@ $connection->close();
                 </div>
 
                 <div class="form-group">
-                    <label for="date_debut">Date de Début</label>
+                    <label for="date_debut">Date de début</label>
                     <input type="date" class="form-control" id="date_debut" name="date_debut" value="<?= htmlspecialchars($date_debut) ?>" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="managers">Assignation des Responsables</label>
+                    <label for="managers">Assignation des responsables</label>
                     <select multiple class="form-control" id="managers" name="managers[]">
                         <?php foreach ($available_managers as $manager): ?>
                             <option value="<?= htmlspecialchars($manager['idUtilisateur']) ?>" <?= in_array($manager['idUtilisateur'], $current_managers) ? 'selected' : '' ?>>
@@ -213,8 +213,8 @@ $connection->close();
                     <small class="form-text text-muted">Maintenez la touche Ctrl (Windows) ou Commande (Mac) pour sélectionner plusieurs responsables.</small>
                 </div>
 
-                <button type="submit" class="btn btn-primary">Mettre à Jour le Projet</button>
-                <a href="manage_projects.php" class="btn btn-secondary">Retour à la Gestion des Projets</a>
+                <button type="submit" class="btn btn-primary">Mettre à jour le projet</button>
+                <a href="manage_projects.php" class="btn btn-secondary">Retour à la gestion des projets</a>
             </form>
         </div>
     </div>

@@ -49,7 +49,7 @@ $connection->close();
 ?>
 
 <div class="container mt-5">
-    <h1 class="mb-4">Tableau de Bord Manager</h1>
+    <h1 class="mb-4">Tableau de bord - Manager</h1>
 
     <!-- Alertes sur les stocks faibles -->
     <?php if ($low_stock_count > 0): ?>
@@ -75,10 +75,10 @@ $connection->close();
                         <thead class="thead-dark">
                         <tr>
                             <th>ID</th>
-                            <th>Nom du Projet</th>
+                            <th>Nom du projet</th>
                             <th>Description</th>
                             <th>Statut</th>
-                            <th>Date de Début</th>
+                            <th>Date de début</th>
                             <th>Actions</th>
                         </tr>
                         </thead>

@@ -104,11 +104,11 @@ $connection->close();
 ?>
 
 <div class="container mt-5">
-    <h1 class="mb-4">Éditer le Produit</h1>
+    <h1 class="mb-4">Éditer le produit</h1>
 
     <div class="card">
         <div class="card-header">
-            <h3>Modifier les Détails du Produit</h3>
+            <h3>Modifier les détails du produit</h3>
         </div>
         <div class="card-body">
             <?php if ($edit_message): ?>
@@ -122,11 +122,11 @@ $connection->close();
             <form method="post" action="">
                 <input type="hidden" name="action" value="edit_product">
                 <div class="form-group">
-                    <label for="nom">Nom du Produit</label>
+                    <label for="nom">Nom du produit</label>
                     <input type="text" class="form-control" id="nom" name="nom" value="<?= htmlspecialchars($nom) ?>" required>
                 </div>
                 <div class="form-group">
-                    <label for="description">Description du Produit</label>
+                    <label for="description">Description du produit</label>
                     <textarea class="form-control" id="description" name="description" rows="3" required><?= htmlspecialchars($description) ?></textarea>
                 </div>
                 <div class="form-row">
@@ -139,7 +139,7 @@ $connection->close();
                         <input type="number" class="form-control" id="stock" name="stock" value="<?= htmlspecialchars($stock) ?>" required>
                     </div>
                     <div class="form-group col-md-3">
-                        <label for="type_produit_id">Type de Produit</label>
+                        <label for="type_produit_id">Type de produit</label>
                         <select class="form-control" id="type_produit_id" name="type_produit_id" required>
                             <option value="">Sélectionnez un type</option>
                             <?php foreach ($type_produits as $type): ?>
@@ -161,8 +161,8 @@ $connection->close();
                         </select>
                     </div>
                 </div>
-                <button type="submit" class="btn btn-primary">Mettre à Jour le Produit</button>
-                <a href="manage_products.php" class="btn btn-secondary">Retour à la Gestion des Produits</a>
+                <button type="submit" class="btn btn-primary">Mettre à jour le produit</button>
+                <a href="manage_products.php" class="btn btn-secondary">Retour à la gestion des produits</a>
             </form>
         </div>
     </div>

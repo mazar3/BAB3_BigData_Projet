@@ -105,7 +105,7 @@ $connection->close();
 ?>
 
 <div class="container mt-5">
-    <h1 class="mb-4">Gestion des Produits</h1>
+    <h1 class="mb-4">Gestion des produits</h1>
 
     <!-- Messages de confirmation -->
     <?php if ($delete_message): ?>
@@ -120,7 +120,7 @@ $connection->close();
     <!-- Formulaire d'ajout de produit -->
     <div class="card mb-4">
         <div class="card-header">
-            <h3>Ajouter un Nouveau Produit</h3>
+            <h3>Ajouter un nouveau produit</h3>
         </div>
         <div class="card-body">
             <?php if ($add_message): ?>
@@ -134,11 +134,11 @@ $connection->close();
             <form method="post" action="">
                 <input type="hidden" name="action" value="add_product">
                 <div class="form-group">
-                    <label for="nom">Nom du Produit</label>
+                    <label for="nom">Nom du produit</label>
                     <input type="text" class="form-control" id="nom" name="nom" required>
                 </div>
                 <div class="form-group">
-                    <label for="description">Description du Produit</label>
+                    <label for="description">Description du produit</label>
                     <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
                 </div>
                 <div class="form-row">
@@ -151,7 +151,7 @@ $connection->close();
                         <input type="number" class="form-control" id="stock" name="stock" required>
                     </div>
                     <div class="form-group col-md-3">
-                        <label for="type_produit_id">Type de Produit</label>
+                        <label for="type_produit_id">Type de produit</label>
                         <select class="form-control" id="type_produit_id" name="type_produit_id" required>
                             <option value="">Sélectionnez un type</option>
                             <?php foreach ($type_produits as $type): ?>
@@ -169,7 +169,7 @@ $connection->close();
                         </select>
                     </div>
                 </div>
-                <button type="submit" class="btn btn-primary">Ajouter le Produit</button>
+                <button type="submit" class="btn btn-primary">Ajouter le produit</button>
             </form>
         </div>
     </div>

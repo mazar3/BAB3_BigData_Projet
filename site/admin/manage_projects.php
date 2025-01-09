@@ -97,7 +97,7 @@ $connection->close();
 ?>
 
 <div class="container mt-5">
-    <h1 class="mb-4">Gestion des Projets</h1>
+    <h1 class="mb-4">Gestion des projets</h1>
 
     <!-- Messages de confirmation -->
     <?php if ($delete_message): ?>
@@ -123,10 +123,10 @@ $connection->close();
                         <thead class="thead-dark">
                         <tr>
                             <th>ID</th>
-                            <th>Nom du Projet</th>
+                            <th>Nom du projet</th>
                             <th>Description</th>
                             <th>Statut</th>
-                            <th>Date de Début</th>
+                            <th>Date de début</th>
                             <th>Client</th>
                             <th>Responsables</th>
                             <th>Actions</th>

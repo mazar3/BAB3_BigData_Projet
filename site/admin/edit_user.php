@@ -1,5 +1,6 @@
 <?php
 // admin/edit_user.php
+global $connection;
 include '../header.php';
 include '../db_connect.php';
 
@@ -113,11 +114,11 @@ $connection->close();
 ?>
 
 <div class="container mt-5">
-    <h1 class="mb-4">Éditer l'Utilisateur</h1>
+    <h1 class="mb-4">Éditer l'utilisateur</h1>
 
     <div class="card">
         <div class="card-header">
-            <h3>Modifier les Détails de l'Utilisateur</h3>
+            <h3>Modifier les Détails de l'utilisateur</h3>
         </div>
         <div class="card-body">
             <?php if ($edit_message): ?>
@@ -141,11 +142,11 @@ $connection->close();
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="email">Adresse Email</label>
+                    <label for="email">Adresse email</label>
                     <input type="email" class="form-control" id="email" name="email" value="<?= htmlspecialchars($email) ?>" required>
                 </div>
                 <div class="form-group">
-                    <label for="password">Mot de Passe <small>(Laisser vide pour ne pas changer)</small></label>
+                    <label for="password">Mot de passe <small>(Laisser vide pour ne pas changer)</small></label>
                     <input type="password" class="form-control" id="password" name="password" placeholder="Nouveau mot de passe">
                 </div>
                 <div class="form-group">
@@ -159,8 +160,8 @@ $connection->close();
                         <?php endforeach; ?>
                     </select>
                 </div>
-                <button type="submit" class="btn btn-primary">Mettre à Jour l'Utilisateur</button>
-                <a href="manage_users.php" class="btn btn-secondary">Retour à la Gestion</a>
+                <button type="submit" class="btn btn-primary">Mettre à Jour l'utilisateur</button>
+                <a href="manage_users.php" class="btn btn-secondary">Retour à la gestion</a>
             </form>
         </div>
     </div>

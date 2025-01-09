@@ -108,7 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         if ($quantite <= 0) {
             $edit_message = "La quantité doit être supérieure à zéro.";
         } else {
-            // Vérifier si le produit existe
+            // Vérifier si le produit existe et obtenir le stock
             $stmt = $connection->prepare("SELECT Stock FROM Produit WHERE idProduit = ?");
             $stmt->bind_param("i", $product_id);
             $stmt->execute();
@@ -147,13 +147,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                         }
                         $stmt->close();
                     }
+                    // Décrémenter le stock du produit
+                    $stmt_reduce_stock = $connection->prepare("UPDATE Produit SET Stock = Stock - ? WHERE idProduit = ?");
+                    $stmt_reduce_stock->bind_param("ii", $quantite, $product_id);
+                    if ($stmt_reduce_stock->execute()) {
+                        // Optionnel : vous pouvez mettre à jour un message ou rafraîchir la page pour refléter le nouveau stock
+                    }
+                    $stmt_reduce_stock->close();
                 }
             } else {
                 $edit_message = "Produit non trouvé.";
                 $stmt->close();
             }
         }
-    } elseif ($_POST['action'] === 'validate_devis') {
+    }
+    elseif ($_POST['action'] === 'validate_devis') {
         // Valider et envoyer le devis au client
         // Mettre à jour le statut du panier et du projet
         $stmt = $connection->prepare("UPDATE Panier SET Statut = 'Devis Envoyé' WHERE idPanier = ?");
@@ -174,6 +182,60 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         } else {
             $edit_message = "Erreur lors de la mise à jour du panier : " . htmlspecialchars($stmt->error);
             $stmt->close();
+        }
+    } elseif ($_POST['action'] === 'remove_from_panier') {
+        // Enlever des produits du panier
+        $product_id = intval($_POST['product_id']);
+        $quantite_a_enlever = intval($_POST['quantite_a_enlever']);
+
+        if ($quantite_a_enlever <= 0) {
+            $edit_message = "La quantité à enlever doit être supérieure à zéro.";
+        } else {
+            // Vérifier la quantité dans le panier pour ce produit
+            $stmt = $connection->prepare("SELECT Quantite FROM Panier_produit WHERE idPanier = ? AND idProduit = ?");
+            $stmt->bind_param("ii", $panier_id, $product_id);
+            $stmt->execute();
+            $stmt->bind_result($quantite_en_panier);
+            if ($stmt->fetch()) {
+                if ($quantite_a_enlever > $quantite_en_panier) {
+                    $edit_message = "La quantité à enlever dépasse la quantité dans le panier.";
+                } else {
+                    $stmt->close();
+                    // Calculer la nouvelle quantité après enlèvement
+                    $nouvelle_quantite = $quantite_en_panier - $quantite_a_enlever;
+
+                    if ($nouvelle_quantite > 0) {
+                        // Mettre à jour la quantité dans le panier si elle reste positive
+                        $stmt = $connection->prepare("UPDATE Panier_produit SET Quantite = ? WHERE idPanier = ? AND idProduit = ?");
+                        $stmt->bind_param("iii", $nouvelle_quantite, $panier_id, $product_id);
+                        if ($stmt->execute()) {
+                            //$edit_message = "Quantité mise à jour dans le panier.";
+                        } else {
+                            $edit_message = "Erreur lors de la mise à jour du panier : " . htmlspecialchars($stmt->error);
+                        }
+                        $stmt->close();
+                    } else {
+                        // Supprimer l'entrée du panier si la quantité atteint 0
+                        $stmt = $connection->prepare("DELETE FROM Panier_produit WHERE idPanier = ? AND idProduit = ?");
+                        $stmt->bind_param("ii", $panier_id, $product_id);
+                        if ($stmt->execute()) {
+                            //$edit_message = "Produit retiré du panier.";
+                        } else {
+                            $edit_message = "Erreur lors de la suppression du produit du panier : " . htmlspecialchars($stmt->error);
+                        }
+                        $stmt->close();
+                    }
+
+                    // Ajouter la quantité retirée au stock du produit
+                    $stmt_increase_stock = $connection->prepare("UPDATE Produit SET Stock = Stock + ? WHERE idProduit = ?");
+                    $stmt_increase_stock->bind_param("ii", $quantite_a_enlever, $product_id);
+                    $stmt_increase_stock->execute();
+                    $stmt_increase_stock->close();
+                }
+            } else {
+                $edit_message = "Produit non trouvé dans le panier.";
+                $stmt->close();
+            }
         }
     }
 }
@@ -231,7 +293,7 @@ $connection->close();
 ?>
 
 <div class="container mt-5">
-    <h1 class="mb-4">Gestion du Projet</h1>
+    <h1 class="mb-4">Gestion du projet</h1>
 
     <!-- Messages de confirmation -->
     <?php if ($edit_message): ?>
@@ -246,7 +308,7 @@ $connection->close();
     <!-- Formulaire de modification du projet -->
     <div class="card mb-4">
         <div class="card-header">
-            <h3>Modifier les Détails du Projet</h3>
+            <h3>Modifier les détails du projet</h3>
         </div>
         <div class="card-body">
             <form method="post" action="">
@@ -255,11 +317,11 @@ $connection->close();
                 <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
                 -->
                 <div class="form-group">
-                    <label for="nom">Nom du Projet</label>
+                    <label for="nom">Nom du projet</label>
                     <input type="text" class="form-control" id="nom" name="nom" value="<?= htmlspecialchars($project['Nom']) ?>" required>
                 </div>
                 <div class="form-group">
-                    <label for="statut">Statut du Projet</label>
+                    <label for="statut">Statut du projet</label>
                     <select class="form-control" id="statut" name="statut" required>
                         <option value="En cours" <?= ($project['Statut'] === 'En cours') ? 'selected' : '' ?>>En cours</option>
                         <option value="Devis Envoyé" <?= ($project['Statut'] === 'Devis Envoyé') ? 'selected' : '' ?>>Devis Envoyé</option>
@@ -268,14 +330,14 @@ $connection->close();
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="date_debut">Date de Début</label>
+                    <label for="date_debut">Date de début</label>
                     <input type="date" class="form-control" id="date_debut" name="date_debut" value="<?= htmlspecialchars($project['Date_Debut']) ?>" required>
                 </div>
                 <div class="form-group">
-                    <label for="description">Description du Projet</label>
+                    <label for="description">Description du projet</label>
                     <textarea class="form-control" id="description" name="description" rows="5" required><?= htmlspecialchars($project['Description']) ?></textarea>
                 </div>
-                <button type="submit" class="btn btn-primary">Mettre à Jour le Projet</button>
+                <button type="submit" class="btn btn-primary">Mettre à jour le projet</button>
             </form>
         </div>
     </div>
@@ -283,7 +345,7 @@ $connection->close();
     <!-- Description et commentaires du client -->
     <div class="card mb-4">
         <div class="card-header">
-            <h3>Description et Commentaires du Client</h3>
+            <h3>Description et commentaires du client</h3>
         </div>
         <div class="card-body">
             <h5>Description :</h5>
@@ -317,26 +379,36 @@ $connection->close();
                 <div class="table-responsive">
                     <table id="panierTable" class="table table-striped table-bordered">
                         <thead class="thead-dark">
-                            <tr>
-                                <th>Nom du Produit</th>
-                                <th>Prix (€)</th>
-                                <th>Quantité</th>
-                                <th>Total (€)</th>
-                            </tr>
+                        <tr>
+                            <th>Nom du produit</th>
+                            <th>Prix (€)</th>
+                            <th>Quantité</th>
+                            <th>Total (€)</th>
+                            <th>Enlever du panier</th>
+                        </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($panier as $item): ?>
-                                <tr>
-                                    <td><?= htmlspecialchars($item['Nom']) ?></td>
-                                    <td><?= htmlspecialchars(number_format($item['Prix'], 2, ',', ' ')) ?></td>
-                                    <td><?= htmlspecialchars($item['Quantite']) ?></td>
-                                    <td><?= htmlspecialchars(number_format($item['Prix'] * $item['Quantite'], 2, ',', ' ')) ?></td>
-                                </tr>
-                            <?php endforeach; ?>
+                        <?php foreach ($panier as $item): ?>
                             <tr>
-                                <td colspan="3" class="text-right"><strong>Montant Total :</strong></td>
-                                <td><strong><?= htmlspecialchars(number_format($total_montant, 2, ',', ' ')) ?> €</strong></td>
+                                <td><?= htmlspecialchars($item['Nom']) ?></td>
+                                <td><?= htmlspecialchars(number_format($item['Prix'], 2, ',', ' ')) ?></td>
+                                <td><?= htmlspecialchars($item['Quantite']) ?></td>
+                                <td><?= htmlspecialchars(number_format($item['Prix'] * $item['Quantite'], 2, ',', ' ')) ?></td>
+                                <td>
+                                    <form method="post" action="" class="d-flex align-items-center">
+                                        <input type="hidden" name="action" value="remove_from_panier">
+                                        <input type="hidden" name="product_id" value="<?= htmlspecialchars($item['idProduit']) ?>">
+                                        <input type="number" name="quantite_a_enlever" value="1" min="1" max="<?= htmlspecialchars($item['Quantite']) ?>" class="form-control" style="width: 70px;" required>
+                                        <button type="submit" class="btn btn-sm btn-danger ml-2">Enlever</button>
+                                    </form>
+                                </td>
                             </tr>
+                        <?php endforeach; ?>
+                        <tr>
+                            <td colspan="3" class="text-right"><strong>Montant Total :</strong></td>
+                            <td><strong><?= htmlspecialchars(number_format($total_montant, 2, ',', ' ')) ?> €</strong></td>
+                            <td></td>
+                        </tr>
                         </tbody>
                     </table>
                 </div>
@@ -345,7 +417,7 @@ $connection->close();
                     <!--
                     <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
                     -->
-                    <button type="submit" class="btn btn-success">Valider et Envoyer le Devis au Client</button>
+                    <button type="submit" class="btn btn-success">Valider et envoyer le devis au client</button>
                 </form>
             <?php endif; ?>
         </div>
@@ -354,7 +426,7 @@ $connection->close();
     <!-- Liste de tous les produits avec option d'ajout au panier -->
     <div class="card mb-4">
         <div class="card-header">
-            <h3>Ajouter des Produits au Projet</h3>
+            <h3>Ajouter des produits au panier</h3>
         </div>
         <div class="card-body">
             <?php if (count($all_products) === 0): ?>
@@ -368,8 +440,7 @@ $connection->close();
                                 <th>Description</th>
                                 <th>Prix (€)</th>
                                 <th>Stock</th>
-                                <th>Quantité</th>
-                                <th>Actions</th>
+                                <th>Ajouter au panier</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -380,11 +451,12 @@ $connection->close();
                                     <td><?= htmlspecialchars(number_format($prod['Prix'], 2, ',', ' ')) ?></td>
                                     <td><?= htmlspecialchars($prod['Stock']) ?></td>
                                     <td>
-                                        <form method="post" action="" class="form-inline">
+                                        <form method="post" action="" class="d-flex align-items-center">
                                             <input type="hidden" name="action" value="add_to_panier">
                                             <input type="hidden" name="product_id" value="<?= htmlspecialchars($prod['idProduit']) ?>">
-                                            <input type="number" name="quantite" value="1" min="1" max="<?= htmlspecialchars($prod['Stock']) ?>" class="form-control mr-2" required>
-                                            <button type="submit" class="btn btn-sm btn-primary">Ajouter au Projet</button>
+                                            <input type="number" name="quantite" value="1" min="1" max="<?= htmlspecialchars($prod['Stock']) ?>"
+                                                   class="form-control" style="width: 70px;" required>
+                                            <button type="submit" class="btn btn-sm btn-primary ml-2">Ajouter</button>
                                         </form>
                                     </td>
                                 </tr>

@@ -1,5 +1,6 @@
 <?php
 // admin/manage_users.php
+global $connection;
 include '../header.php';
 include '../db_connect.php';
 
@@ -103,12 +104,12 @@ $connection->close();
 ?>
 
 <div class="container mt-5">
-    <h1 class="mb-4">Gestion des Utilisateurs</h1>
+    <h1 class="mb-4">Gestion des utilisateurs</h1>
 
     <!-- Formulaire d'ajout d'utilisateur -->
     <div class="card mb-4">
         <div class="card-header">
-            <h3>Ajouter un Nouvel Utilisateur</h3>
+            <h3>Ajouter un nouvel utilisateur</h3>
         </div>
         <div class="card-body">
             <?php if ($add_message): ?>
@@ -132,11 +133,11 @@ $connection->close();
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="email">Adresse Email</label>
+                    <label for="email">Adresse email</label>
                     <input type="email" class="form-control" id="email" name="email" required>
                 </div>
                 <div class="form-group">
-                    <label for="password">Mot de Passe</label>
+                    <label for="password">Mot de passe</label>
                     <input type="password" class="form-control" id="password" name="password" required>
                 </div>
                 <div class="form-group">
@@ -148,7 +149,7 @@ $connection->close();
                         <?php endforeach; ?>
                     </select>
                 </div>
-                <button type="submit" class="btn btn-primary">Ajouter l'Utilisateur</button>
+                <button type="submit" class="btn btn-primary">Ajouter l'utilisateur</button>
             </form>
         </div>
     </div>
@@ -166,7 +167,7 @@ $connection->close();
     <!-- Table des utilisateurs -->
     <div class="card">
         <div class="card-header">
-            <h3>Liste des Utilisateurs</h3>
+            <h3>Liste des utilisateurs</h3>
         </div>
         <div class="card-body">
             <?php if (count($users) === 0): ?>
