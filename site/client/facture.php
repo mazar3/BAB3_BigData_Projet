@@ -28,7 +28,7 @@ $idProjet = intval($_GET['idProjet']);
 // Connexion à la base de données
 include '../db_connect.php';
 
-// Récupérer les détails du projet sans la date de fin
+// Récupérer les détails du projet
 $stmt = $connection->prepare("
     SELECT p.Nom, p.Description, p.Statut, DATE_FORMAT(p.Date_Debut, '%d/%m/%Y') AS DateDebutFormat, p.idPanier
     FROM Projet p

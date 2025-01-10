@@ -265,11 +265,7 @@ $connection->close();
                     <?php elseif ($project['Statut'] === 'Terminé'): ?>
                         <p class="mt-3">Vous avez accepté le devis. Le projet est maintenant terminé.</p>
                         <p>Voici votre facture (PDF) :</p>
-                        <!-- Faux bouton de téléchargement de la facture -->
-<!--                        <button class="btn btn-info">Télécharger la Facture (PDF)</button>-->
                         <a href="facture.php?idProjet=<?= urlencode($idProjet) ?>" class="btn btn-info" target="_blank">Télécharger la Facture (PDF)</a>
-
-
                         <?php
                         echo '<p class="mt-3">Veuillez effectuer le paiement par virement bancaire sur le compte suivant :</p>
                             <ul>
